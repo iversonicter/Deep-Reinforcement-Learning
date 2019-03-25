@@ -19,15 +19,15 @@ class DQN(object):
         self.q_values = tf.placeholder(tf.float32, [None, self.action_space])
 
         self.predictions = self.create_network(self.input_state)
-        self.loss = tf.losses.mean_squared_error(labels = self.q_values, predictions = self.prediction)
+        self.loss = tf.losses.mean_squared_error(labels = self.q_values, predictions = self.predictions)
         self.optim = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
         self.sess.run(tf.global_variables_initializer())
 
     def create_network(self, input_x):
-        conv1 = conv(input_x, 8, 8, 32, 4, 4, "conv1", True, "VALID")
-        conv2 = conv(conv1, 4, 4, 64, 2, 2, "conv2", True, "VALID")
-        conv3 = conv(conv2, 3, 3, 64, 1, 1, "conv3", True, "VALID")
-        flatten = tf.reshape(conv3, shape = [conv3.get_shape().as_list()[0], -1], name = "flatten")
+        conv1 = conv(input_x, 8, 8, 32, 4, 4, "conv1", True, "SAME")
+        conv2 = conv(conv1, 4, 4, 64, 2, 2, "conv2", True, "SAME")
+        conv3 = conv(conv2, 3, 3, 32, 2, 2, "conv3", True, "SAME")
+        flatten = tf.reshape(conv3, shape = [-1, 5 * 5 * 32], name = "flatten")
         fc1 = fc(flatten, flatten.get_shape().as_list()[1], 512, "fc1", True)
         fc2 = fc(fc1, 512, self.action_space, "fc2", False)
         return fc2
@@ -38,9 +38,6 @@ class DQN(object):
     def forward(self, state):
         return self.sess.run(self.predictions, feed_dict = {self.input_state : state})
 
-    def save(self):
+    def save(self, saved_Name, step):
         saver = tf.train.Saver()
-        saver.save(self.save, saved_Name, step))
-        
-
-
+        saver.save(self.save, saved_Name, step)

@@ -14,7 +14,8 @@ def preprocess_atari(frame):
     frame[frame == 144] = 0 # erase background type 1
     frame[frame == 109] = 0 # erase background type 2
     frame[frame != 0] = 1 # set paddles, ball to 1
-    return frame.astype(np.float).ravel()
+    frame = frame.astype(np.float)
+    return frame[:, :, np.newaxis]
 
     
 def conv(x, filter_height, filter_width, num_filter, stride_x, stride_y, name, relu = True,  padding = 'SAME'):
