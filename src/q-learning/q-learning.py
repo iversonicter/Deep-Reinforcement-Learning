@@ -80,13 +80,13 @@ def main():
         while not is_terminal:
             A = choose_action(S, q_table)
             S_, R = get_env_feedback(S, A)
-            q_predict = q_table.loc[S, A]
+            q_predict = q_table.loc[S, A] # get prediction from q_table
             if S_ != 'terminal':
-                q_target = R + GAMMA * q_table.iloc[S_, :].max()
+                q_target = R + GAMMA * q_table.iloc[S_, :].max() # target prediction: current_reward + gamma * max(q_table[next_state])
             else:
                 q_target = R
                 is_terminal = True
-            q_table.loc[S, A] += ALPHA * (q_target - q_predict)
+            q_table.loc[S, A] += ALPHA * (q_target - q_predict) # update q_table
             S = S_
             update_env(S, episode, step_counter+1)
 
