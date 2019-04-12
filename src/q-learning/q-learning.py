@@ -13,7 +13,7 @@ MAX_EPISODES = 13
 FRESH_TIME = 0.3
 
 '''
-Simulator 
+Simulator  the treasure on the right side
 ----------------------------------
 | S |<- ->|<- ->|<- ->|<- ->| T |
 ----------------------------------
@@ -88,12 +88,9 @@ def main():
                 is_terminal = True
             q_table.loc[S, A] += ALPHA * (q_target - q_predict)
             S = S_
-
             update_env(S, episode, step_counter+1)
 
-
     return q_table
-
 
 if __name__ == "__main__":
     q_table = main()
