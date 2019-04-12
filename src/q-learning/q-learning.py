@@ -36,7 +36,6 @@ def choose_action(state, q_table):
 
     return action_name
 
-
 def get_env_feedback(S, A):
 
     if A == 'right':
