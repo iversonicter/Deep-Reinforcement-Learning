@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../env')
 from maze_env import Maze
 from Q_learning import QLearning
 
