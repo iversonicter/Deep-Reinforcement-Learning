@@ -11,7 +11,7 @@ import numpy as np
 import random
 
 
-class Agent(object):
+class DQN(object):
 
     def __init__(self, env_name, gamma, memory_size, replace_iter,
             exploration_rate, exploration_min, exploration_decay,
