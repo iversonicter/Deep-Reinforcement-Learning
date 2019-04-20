@@ -1,7 +1,10 @@
+# Author : Wang Yongjie
+# Email  : yongjie.wang@ntu.edu.sg
+# Description: DQN
+
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.autograd import Variable
+import torch.nn.functional as F
 import numpy as np
 
 class Net(nn.Module):
@@ -12,12 +15,13 @@ class Net(nn.Module):
         self.action_space = action_space
 
         self.fc1 = nn.Linear(self.state_space, 10) # 10 hidden units
-        self.fc2 = nn.Linear(10, self.action)
+        self.fc2 = nn.Linear(10, self.action_space)
         
 
     def forward(self, x):
-        x = nn.ReLU(self.fc1(x))
-        output = self.fc2(x)
+        fc1 = self.fc1(x)
+        relu1 = F.relu(fc1)
+        output = self.fc2(fc1)
 
         return output
 
