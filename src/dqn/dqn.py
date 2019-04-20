@@ -83,7 +83,8 @@ class DQN(object):
             next_state = next_state.unsqueeze(0)
             next_state = Variable(next_state.float().cuda())
             if not terminal:
-                q_update = (q_update + self.gamma * torch.max(self.Target_Net(next_state)[0]))
+                q_update = (q_update + self.gamma * torch.max(self.Target_Net(next_state)[0])) original dqn
+
             
             state = torch.from_numpy(state)
             state = state.unsqueeze(0)
