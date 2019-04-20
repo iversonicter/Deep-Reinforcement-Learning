@@ -11,7 +11,7 @@ import numpy as np
 import random
 
 
-class Doubel_DQN(object):
+class Double_DQN(object):
 
     def __init__(self, env_name, gamma, memory_size, replace_iter,
             exploration_rate, exploration_min, exploration_decay,
@@ -83,7 +83,11 @@ class Doubel_DQN(object):
             next_state = next_state.unsqueeze(0)
             next_state = Variable(next_state.float().cuda())
             if not terminal:
-                q_update = (q_update + self.gamma * torch.max(self.Target_Net(next_state)[0]))
+                #q_update = (q_update + self.gamma * torch.max(self.Target_Net(next_state)[0])) # original dqn
+                eval_next = self.Eval_Net(next_state)[0]
+                action_next = torch.argmax(eval_next).item()
+                target_next = self.Target_Net(next_state)[0]
+                q_update = (q_update + self.gamma * target_next[action_next])
             
             state = torch.from_numpy(state)
             state = state.unsqueeze(0)
@@ -115,7 +119,7 @@ class Doubel_DQN(object):
 
                 action = self.choose_action(observation)
                 observation_, reward, done, info = self.env.step(action)
-                reward = reward if not done else -reward
+                reward = reward if not done else -reward * 5
                 self.memorize(observation, action, reward, observation_, done)
                 if total_step > 100:
                     self.experience_replay()
@@ -136,5 +140,8 @@ class Doubel_DQN(object):
         plt.ylabel("Cost")
         plt.xlabel("training steps")
         plt.show()
+
+    def close(self):
+        self.env.close()
 
 
