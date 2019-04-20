@@ -66,8 +66,8 @@ class Agent(object):
 
     def experience_replay(self):
 
-        if len(self.memory) < self.batch_size:
-            return
+        #if len(self.memory) < self.batch_size:
+        #    return
 
         if self.learn_step_counter % self.replace_iter == 0:
             self.Target_Net = self.Eval_Net
@@ -91,6 +91,7 @@ class Agent(object):
             q_values = self.Eval_Net(state)[0][action]
             loss = self.loss_func(q_values, q_update)
             batch_loss += loss
+            self.optim.zero_grad()
             loss.backward() # compute the gradient
             self.optim.step() # back proprogate
 
@@ -103,9 +104,7 @@ class Agent(object):
         return
 
     def run(self):
-
         total_step = 0
-
         for i in range(self.epoches):
             observation = self.env.reset()
             ep_r = 0
@@ -118,8 +117,7 @@ class Agent(object):
                 observation_, reward, done, info = self.env.step(action)
                 reward = reward if not done else -reward
                 self.memorize(observation, action, reward, observation_, done)
-                if done:
-                #if total_step % 20 == 0:
+                if total_step > 100:
                     self.experience_replay()
 
                 ep_r += reward
