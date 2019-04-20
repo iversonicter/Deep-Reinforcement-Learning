@@ -56,7 +56,7 @@ class Agent(object):
         state = torch.from_numpy(state)
         state = state.unsqueeze(0)
         state = Variable(state.float().cuda())
-        if np.random.uniform() < self.exploration_rate:
+        if np.random.rand() > self.exploration_rate:
             actions_value = self.Eval_Net(state)[0]
             action = torch.argmax(actions_value).item()
         else:
@@ -65,6 +65,10 @@ class Agent(object):
         return action
 
     def experience_replay(self):
+
+        if len(self.memory) < self.batch_size:
+            return
+
         if self.learn_step_counter % self.replace_iter == 0:
             self.Target_Net = self.Eval_Net
 
@@ -112,15 +116,8 @@ class Agent(object):
 
                 action = self.choose_action(observation)
                 observation_, reward, done, info = self.env.step(action)
-
-                x, x_dot, theta, theta_dot = observation_
-
-                r1 = (self.env.x_threshold - abs(x)) / self.env.x_threshold - 0.8
-                r2 = (self.env.theta_threshold_radians - abs(theta)) / self.env.theta_threshold_radians - 0.5
-                reward = r1 + r2
-
+                reward = reward if not done else -reward
                 self.memorize(observation, action, reward, observation_, done)
-
                 if done:
                 #if total_step % 20 == 0:
                     self.experience_replay()
