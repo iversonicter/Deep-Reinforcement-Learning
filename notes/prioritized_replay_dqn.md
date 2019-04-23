@@ -6,9 +6,10 @@ We can define an error of a sample S = (s, a, r, s') as a distance between the Q
 
 error  = |Q(s,a) - T(s)|
 
-For DDQN described above, T it would be <img src="http://latex.codecogs.com/gif.latex?\frac{\partial J}{\partial \theta_k^{(j)}}=\sum_{i:r(i,j)=1}{\big((\theta^{(j)})^Tx^{(i)}-y^{(i,j)}\big)x_k^{(i)}}+\lambda \theta_k^{(j)}" />
+For DDQN described above, T it would be 
+<img src="http://latex.codecogs.com/gif.latex?T(s) = r + \gamma \hat_Q(s', argmax_a Q(s', a))"/>
 
-T(s) = r + \gamma \hat_Q(s', argmax_a Q(s', a))
+
 
 One of the possible approaches to PER is proportional prioritization. The error is first conveyed to priority using this formula
 
