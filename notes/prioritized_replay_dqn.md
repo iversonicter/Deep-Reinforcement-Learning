@@ -13,7 +13,7 @@ For DDQN described above, T it would be
 
 One of the possible approaches to PER is proportional prioritization. The error is first conveyed to priority using this formula
 
-![](http://latex.codecogs.com/gif.latex?\\ p = (error + \epsilon)^a)
+<img src="http://latex.codecogs.com/gif.latex?p = (error + \epsilon)^a(s)"/>
 
 Epsilon is a small positive constant that ensures that no transition has zero priority. Alpha, 0 <= \alpha <= 1 controls the different between high and low error. it dertimines how much prioritization is used. With alpha = 0, we would get the uniform case.
 
