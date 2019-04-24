@@ -4,10 +4,6 @@ IMAGE_WIDTH = 84
 IMAGE_HEIGHT = 84
 IMAGE_STACK = 2
 
-HUBER_LOSS_DELTA = 2.0
-LEARNING_RATE = 0.0002
-
-
 def preprocess(img):
 
     rgb = scipy.misc.imresize(img, (IMAGE_WIDTH, IMAGE_HEIGHT))
