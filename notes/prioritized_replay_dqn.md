@@ -19,6 +19,6 @@ Epsilon is a small positive constant that ensures that no transition has zero pr
 
 Priority is translated to  probability of being choose for replay. A sample i has a probability of being picked during the experience replay determined by a formula
 
-<img src="http://latex.codecogs.com/gif.latex? P_i = \frac{p_i}{\sum_k p_k}"/>
+<img src="http://latex.codecogs.com/gif.latex?P_i = \frac{p_i}{\sum_k p_k}"/>
 
 The algorithm is simple - during each learning step we will get a batch of samples with this probability distribution and train our network on it. We only need an effective way of storing these priorities and sampling from them.
