@@ -16,12 +16,3 @@ def preprocess(img):
 
     output = gray.astype('float32') / 128 - 1
     return output
-
-'''
-def huber_loss(y_true, y_pred):
-
-    err = y_true - y_pred
-    cond =  abs(err) < HUBER_LOSS_DELTA
-    L2 = 0.5 * 
-
-'''
