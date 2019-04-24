@@ -19,11 +19,6 @@ class SubTree:
         #[----------data frame-------------]
         # size : capacity - 1
 
-    def retrieve(self, idx, s):
-
-
-        return
-
     def total(self):
         return self.tree[0]
 
@@ -37,7 +32,7 @@ class SubTree:
         of self.pointer >= self.capacity: # replace when exceed the capacity
             self.pointer = 0
 
-    def update(self, idx, p):
+    def update(self, tree_idx, p):
         change = p - self.tree[tree_idx]
         self.tree[tree_idx] = p
 
@@ -46,14 +41,19 @@ class SubTree:
             tree_idx = (tree_idx - 1) // 2
             self.tree[tree_idx] += change
 
-    def get(self, s):
+    def get(self, v):
         """
+        Tree structure and array storage
 
+        Tree index:
+            0   -> storing pripority sum
+           / \
+          1   2
+         / \ / \
+        3  4 5  6   -> storing priority for transitions
 
-
-
-
-
+        array type for storing
+        [0, 1, 2, 3, 4, 5]
 
         """
         parent_idx = 0
@@ -73,7 +73,5 @@ class SubTree:
 
         data_idx = leaf_idx - self.capacity + 1
         return leaf_idx, self.tree[leaf_idx], self.data[data_idx]
-
-
 
 
