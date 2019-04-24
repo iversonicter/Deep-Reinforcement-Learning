@@ -1,3 +1,7 @@
+# Author : Wang Yongjie
+# Email  : yongjie.wang@ntu.edu.sg
+# Description: Network of DQN
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
