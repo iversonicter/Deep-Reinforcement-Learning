@@ -24,7 +24,7 @@ class SubTree:
 
     def add(self, p, data):
 
-        tree_idx = self.pointer + seld.capacity - 1
+        tree_idx = self.pointer + self.capacity - 1
         self.data[self.pointer]  = data # updata data frame O(1)
         self.update(tree_idx, p) # update tree frame O(log(N))
         

@@ -29,7 +29,7 @@ class Memory(object):
 
             s = random.uniform(a, b)
             (idx, p, data) = self.tree.get(s)
-            batch.append(idx, data)
+            batch.append((idx, data))
 
         return batch
 

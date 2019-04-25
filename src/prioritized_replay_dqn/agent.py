@@ -73,8 +73,10 @@ class Prioritized_Double_DQN(object):
         target_next = self.Target_Net(next_state)
 
         # return variable
-        x = np.zeros((len(batch_samples), IMAGE_STACK, IMAGE_WIDTH, IMAGE_HEIGHT))
-        y = np.zeros((len(batch_samples), self.action_space))
+        predict_qvalue = torch.zeros((len(batch_samples)))
+        target_qvalue = torch.zeros((len(batch_samples)))
+        #x = np.zeros((len(batch_samples), IMAGE_STACK, IMAGE_WIDTH, IMAGE_HEIGHT))
+        #y = np.zeros((len(batch_samples), self.action_space))
         errors = np.zeros(len(batch_samples))
 
         for i in range(len(batch_samples)):
@@ -89,16 +91,17 @@ class Prioritized_Double_DQN(object):
             else:
                 action_next = torch.argmax(eval_next[i]).item()
                 t[action] = (reward + self.gamma * target_next[i][action_next]) # double DQN
+ 
 
-            x[i] = state.datach().numpy()
-            y[i] = t.detach().numpy()
-            errors[i] = torch.abs(oldVal - t[action])
+            predict_qvalue[i] = oldVal
+            target_qvalue[i] = t[action]
+            errors[i] = abs(oldVal.item() - t[action].item())
 
-        return (x, y, errors)
+        return (predict_qvalue, target_qvalue, errors)
 
     def memorize(self, samples): 
         # samples format (current state, action, reward, next state)
-        x, y, errors = self._getTarget([(0, samples)])
+        _, _, errors = self._getTarget([(0, samples)])
         self.memory.add(errors[0], samples)
 
     def experience_replay(self):
@@ -112,7 +115,7 @@ class Prioritized_Double_DQN(object):
         for i in range(len(batch_samples)):
             idx = batch_samples[i][0]
             self.memory.update(idx, errors[i])
-            loss = self.loss_func(y[i], y[i] + errors[i])
+            loss = self.loss_func(x[i], y[i])
             batch_loss += loss
 
         self.optim.zero_grad()
@@ -152,7 +155,7 @@ class Prioritized_Double_DQN(object):
                     print("Epoch: ", i, "\t reward: ", ep_r, "\t total steps: ", step)
                     break
 
-                observation = observation_
+                current_state = next_state
                 total_step += 1
                 step += 1
 
