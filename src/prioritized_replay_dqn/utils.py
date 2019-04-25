@@ -1,4 +1,4 @@
-import scipy
+import scipy.misc
 
 IMAGE_WIDTH = 84
 IMAGE_HEIGHT = 84
