@@ -4,7 +4,7 @@
 
 from net import Net
 from memory import Memory
-import gym
+import gym, math
 import torch
 from torch.autograd import Variable
 import numpy as np
@@ -15,7 +15,7 @@ from utils import *
 class Prioritized_Double_DQN(object):
 
     def __init__(self, env_name, gamma, memory_size, replace_iter,
-            exploration_rate, exploration_min, exploration_decay,
+            exploration_rate, exploration_min, exploration_max,
             lr, batch_size, epoches = 1000, is_render = True):
 
         self.env = gym.make(env_name)
@@ -25,7 +25,7 @@ class Prioritized_Double_DQN(object):
         self.replace_iter = replace_iter # 
         self.exploration_rate = exploration_rate
         self.exploration_min = exploration_min
-        self.exploration_decay = exploration_decay
+        self.exploration_max = exploration_max
         self.lr = lr
         self.epoches = epoches
         self.batch_size = batch_size
@@ -122,9 +122,9 @@ class Prioritized_Double_DQN(object):
         batch_loss.backward()
         self.optim.step()
 
-        self.exploration_rate = self.exploration_rate * self.exploration_decay
-        if self.exploration_rate < self.exploration_min:
-            self.exploration_rate = self.exploration_min
+        self.exploration_rate = self.exploration_min + (self.exploration_max - self.exploration_min) * math.exp(-math.log(0.01) / 500000 * self.learn_step_counter)
+        if self.exploration_rate < 0.01:
+            self.exploration_rate = 0.01
 
         self.learn_step_counter += 1
         self.cost_hist.append(batch_loss.item() / self.batch_size)
