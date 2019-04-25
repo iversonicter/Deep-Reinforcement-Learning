@@ -29,7 +29,7 @@ class SubTree:
         self.update(tree_idx, p) # update tree frame O(log(N))
         
         self.pointer += 1
-        of self.pointer >= self.capacity: # replace when exceed the capacity
+        if self.pointer >= self.capacity: # replace when exceed the capacity
             self.pointer = 0
 
     def update(self, tree_idx, p):

@@ -9,9 +9,10 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 import random
+from utils import *
 
 
-class Double_DQN(object):
+class Prioritized_Double_DQN(object):
 
     def __init__(self, env_name, gamma, memory_size, replace_iter,
             exploration_rate, exploration_min, exploration_decay,
@@ -61,7 +62,7 @@ class Double_DQN(object):
         # convert numpy to tensor
         state = torch.from_numpy(state)
         next_state = torch.from_numpy(next_state)
-        state = Variable(state.float()).cuda())
+        state = Variable(state.float().cuda())
         next_state = Variable(next_state.float().cuda())
 
         # evaluate the current state
@@ -72,12 +73,12 @@ class Double_DQN(object):
         target_next = self.Target_Net(next_state)
 
         # return variable
-        x = np.zeros((len(batch), IMAGE_STACK, IMAGE_WIDTH, IMAGE_HEIGHT))
-        y = np.zeros((len(batch), self.action_space))
-        errors = np.zeros(len(batch))
+        x = np.zeros((len(batch_samples), IMAGE_STACK, IMAGE_WIDTH, IMAGE_HEIGHT))
+        y = np.zeros((len(batch_samples), self.action_space))
+        errors = np.zeros(len(batch_samples))
 
         for i in range(len(batch_samples)):
-            sample = batch_samples[i][1]
+            sample = batch_samples[i][1] # batch_samples (errors, sample)
             state, action, reward, next_state = sample[0], sample[1], sample[2], sample[3]
 
             t = eval_current[i]
@@ -86,12 +87,12 @@ class Double_DQN(object):
             if next_state is None:
                 t[action] = r
             else:
-                action_next = torch.argmax(eval_next).item()
-                q_update = (q_update + self.gamma * target_next[action_next])
+                action_next = torch.argmax(eval_next[i]).item()
+                t[action] = (reward + self.gamma * target_next[i][action_next]) # double DQN
 
-            x[i] = state
-            y[i] = t
-            errors[i] = abs(oldVal - t[a])
+            x[i] = state.datach().numpy()
+            y[i] = t.detach().numpy()
+            errors[i] = torch.abs(oldVal - t[action])
 
         return (x, y, errors)
 
@@ -111,10 +112,12 @@ class Double_DQN(object):
         for i in range(len(batch_samples)):
             idx = batch_samples[i][0]
             self.memory.update(idx, errors[i])
-            self.optim.zero_grad()
-            errors[i].backward()
-            self.optim.step()
+            loss = self.loss_func(y[i], y[i] + errors[i])
             batch_loss += loss
+
+        self.optim.zero_grad()
+        batch_loss.backward()
+        self.optim.step()
 
         self.exploration_rate = self.exploration_rate * self.exploration_decay
         if self.exploration_rate < self.exploration_min:
@@ -127,17 +130,21 @@ class Double_DQN(object):
         total_step = 0
         for i in range(self.epoches):
             observation = self.env.reset()
+            observation = preprocess(observation)
+            current_state = np.array([observation, observation])
             ep_r = 0
             step = 0
             while True:
                 if self.is_render:
                     self.env.render()
 
-                action = self.choose_action(observation)
-                observation_, reward, done, info = self.env.step(action)
-                reward = reward if not done else -reward * 5
-                self.memorize(observation, action, reward, observation_, done)
-                if total_step > 100:
+                action = self.choose_action(current_state)
+                next_state, reward, done, info = self.env.step(action)
+                next_state = np.array([current_state[1], preprocess(next_state)])
+                reward = np.clip(reward, -1, 1) # clip reward to [-1, 1]
+
+                self.memorize((current_state, action, reward, next_state))
+                if total_step > 10:
                     self.experience_replay()
 
                 ep_r += reward
@@ -158,5 +165,4 @@ class Double_DQN(object):
 
     def close(self):
         self.env.close()
-
 
