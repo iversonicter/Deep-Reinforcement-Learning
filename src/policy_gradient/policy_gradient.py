@@ -3,22 +3,21 @@
 # Description: Policy gradient
 
 import numpy as np
-from net import Net
 import torch
 
 class Agent(object):
 
-    def __init__(self, eval_net, lr, reward_decay = 0.95, is_render = False):
+    def __init__(self, eval_net, lr, reward_decay = 0.95):
 
-        self.Eval_Network = Net(state_space, action_space).cuda() # train with GPU
+        self.Eval_Network = eval_net # train with GPU
         self.lr = lr
         self.reward_decay = reward_decay
-        self.is_render = is_render
         self.states, self.actions, self.rewards = [], [], []
         self.loss_func = torch.nn.CrossEntropyLoss().cuda()
         self.optim = torch.optim.SGD(self.Eval_Network.parameters(), lr = self.lr)
 
     def choose_action(self, state):
+
         state = torch.from_numpy(state)
         state = state.unsqueeze(0)
         state = Variable(state.float().cuda())
@@ -28,6 +27,7 @@ class Agent(object):
         return action
 
     def store_transition(self, state, action, reward):
+
         self.states.append(state)
         self.actions.append(action)
         self.rewards.append(reward)
@@ -44,17 +44,19 @@ class Agent(object):
         discount_reward /= np.std(discount_reward)
         # convert to tensor variable
 
-        loss = self.loss_func(self.)
+        states = torch.from_numpy(np.stack(self.states))
+        actions = torch.form_numpy(np.stack(self.actions))
+        states  = Variable(states.float().cuda())
+        actions = Variable(actions.float().cuda())
+        discount_reward = Variable(torch.from_numpy(discount_reward).float().cuda())
+
+        predicition = self.Eval_Network(state)
+
+        loss = self.loss_func(prediction, actions)
         weighted_loss = loss * discount_reward
 
         # update loss
         self.optim.zero_grad()
         weighted_loss.backward()
         self.optim.step()
-
-        
-
-
-
-
 
