@@ -9,7 +9,7 @@ This repo includes a series of algorithms about deep reinforcement learning.
 # DQN
 
 
-# Policy gradient
+# Policy Gradient
 
 
 # Actor Critic
