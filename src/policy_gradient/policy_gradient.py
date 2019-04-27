@@ -3,7 +3,9 @@
 # Description: Policy gradient
 
 import numpy as np
+from torch.autograd import Variable
 import torch
+import torch.nn.functional as F
 
 class Agent(object):
 
@@ -22,8 +24,9 @@ class Agent(object):
         state = state.unsqueeze(0)
         state = Variable(state.float().cuda())
         prediction = self.Eval_Network(state)
+        prediction = F.softmax(prediction)
         prediction = prediction[0].cpu().detach().numpy()
-        action = np.random.choice(prediction.shape, prediction)
+        action = np.random.choice(range(prediction.shape[0]),p =  prediction)
         return action
 
     def store_transition(self, state, action, reward):
@@ -37,7 +40,7 @@ class Agent(object):
         discount_reward = np.zeros_like(self.rewards)
         running_add = 0
         for t in reversed(range(0, len(self.rewards))):
-            running_add = running_add * self.gamma + self.rewards[t]
+            running_add = running_add * self.reward_decay + self.rewards[t]
             discount_reward[t] = running_add
         # normalize episode rewards
         discount_reward -= np.mean(discount_reward)
@@ -45,15 +48,16 @@ class Agent(object):
         # convert to tensor variable
 
         states = torch.from_numpy(np.stack(self.states))
-        actions = torch.form_numpy(np.stack(self.actions))
+        actions = torch.from_numpy(np.stack(self.actions))
         states  = Variable(states.float().cuda())
-        actions = Variable(actions.float().cuda())
+        actions = Variable(actions.long().cuda())
         discount_reward = Variable(torch.from_numpy(discount_reward).float().cuda())
 
-        predicition = self.Eval_Network(state)
+        prediction = self.Eval_Network(states)
 
         loss = self.loss_func(prediction, actions)
         weighted_loss = loss * discount_reward
+        weighted_loss = torch.mean(weighted_loss)
 
         # update loss
         self.optim.zero_grad()
