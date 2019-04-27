@@ -10,7 +10,8 @@ env = gym.make('CartPole-v0')
 env.seed(1)
 is_render = False
 
-eval_net = Net(env.observation_space.shape, env.action_space.n)
+eval_net = Net(env.observation_space.shape[0], env.action_space.n)
+eval_net = eval_net.cuda()
 agent = Agent(eval_net, lr = 0.02, reward_decay = 0.99)
 
 for i in range(300):
