@@ -14,7 +14,7 @@ eval_net = Net(env.observation_space.shape[0], env.action_space.n)
 eval_net = eval_net.cuda()
 agent = Agent(eval_net, lr = 0.02, reward_decay = 0.99)
 
-for i in range(3000):
+for i in range(300):
     observation = env.reset()
     total_reward = 0
 

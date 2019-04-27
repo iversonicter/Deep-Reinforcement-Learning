@@ -19,15 +19,10 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(self.state_space, 10)
         self.fc2 = nn.Linear(10, self.action_space)
 
-
     def forward(self, x):
-
         fc1 = self.fc1(x)
         tanh1 = F.tanh(fc1)
         fc2 = self.fc2(tanh1)
 
         return fc2
-
-
-
 

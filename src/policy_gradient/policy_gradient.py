@@ -16,7 +16,7 @@ class Agent(object):
         self.reward_decay = reward_decay
         self.states, self.actions, self.rewards = [], [], []
         self.loss_func = torch.nn.CrossEntropyLoss().cuda()
-        self.optim = torch.optim.SGD(self.Eval_Network.parameters(), lr = self.lr)
+        self.optim = torch.optim.Adam(self.Eval_Network.parameters(), lr = self.lr)
 
     def choose_action(self, state):
 
@@ -26,7 +26,7 @@ class Agent(object):
         prediction = self.Eval_Network(state)
         prediction = F.softmax(prediction)
         prediction = prediction[0].cpu().detach().numpy()
-        action = np.random.choice(range(prediction.shape[0]),p =  prediction)
+        action = np.random.choice(range(prediction.shape[0]),p = prediction)
         return action
 
     def store_transition(self, state, action, reward):
@@ -48,14 +48,19 @@ class Agent(object):
         # convert to tensor variable
 
         states = torch.from_numpy(np.stack(self.states))
-        actions = torch.from_numpy(np.stack(self.actions))
+        # convert actions to one-hot vector
+        actions = np.zeros((len(self.actions), 2))
+        actions[np.arange(len(self.actions)), self.actions] = 1
+        actions = torch.from_numpy(actions)
         states  = Variable(states.float().cuda())
-        actions = Variable(actions.long().cuda())
+        actions = Variable(actions.float().cuda())
         discount_reward = Variable(torch.from_numpy(discount_reward).float().cuda())
 
         prediction = self.Eval_Network(states)
+        prediction = F.softmax(prediction)
 
-        loss = self.loss_func(prediction, actions)
+        loss = torch.sum(-torch.log(prediction) * actions, dim = 1)
+
         weighted_loss = loss * discount_reward
         weighted_loss = torch.mean(weighted_loss)
 
@@ -63,4 +68,7 @@ class Agent(object):
         self.optim.zero_grad()
         weighted_loss.backward()
         self.optim.step()
+
+        # clear current episode
+        self.states, self.actions, self.rewards = [], [], []
 
