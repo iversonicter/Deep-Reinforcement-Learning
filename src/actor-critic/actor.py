@@ -6,11 +6,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from  torch.autograd import Variable
 
 
-class Net(nn.Module):
+class ANet(nn.Module):
     def __init__(self, state_space, action_space):
-        super(Net, self).__init__()
+        super(ANet, self).__init__()
         self.state_space = state_space
         self.action_space = action_space
 
@@ -38,10 +39,10 @@ class Actor(object):
         state = Variable(state.float().cuda())
         prediction = self.Net(state)
         prediction = F.softmax(prediction)
-        log_prob = prediction[action] #
-        loss = log_prob * td_error
+        log_prob = prediction[0][action] #
+        loss = torch.mean(log_prob * td_error)
         self.optim.zero_grad()
-        loss .backward()
+        loss.backward()
         self.optim.step()
 
     def choose_action(self, state):
@@ -54,5 +55,4 @@ class Actor(object):
         prediction = prediction[0].cpu().detach().numpy()
         action = np.random.choice(range(prediction.shape[0]), p = prediction)
         return action
-
 
