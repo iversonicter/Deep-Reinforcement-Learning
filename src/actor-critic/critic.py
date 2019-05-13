@@ -6,11 +6,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from  torch.autograd import Variable
 
 class CNet(nn.Module):
 
     def __init__(self, state_space):
-        super(Net, self).__init__()
+        super(CNet, self).__init__()
         self.state_space = state_space
         self.fc1 = nn.Linear(self.state_space, 20)
         self.fc2 = nn.Linear(20, 1)
@@ -39,13 +40,13 @@ class Critic(object):
         next_state = Variable(next_state.float().cuda())
 
         current_value = self.Net(current_state)
-        next_value = self.Net(next_value)
+        next_value = self.Net(next_state)
 
-        td_error = reward + self.gamma * next_value - self.current_value
-        loss = torch.mul(td_error, td_error)
+        td_error = reward + self.gamma * next_value - current_value
+        loss = torch.mean(torch.mul(td_error, td_error))
 
         self.optim.zero_grad()
-        loss.backward()
+        loss.backward(retain_graph = True)
         self.optim.step()
 
         return td_error
