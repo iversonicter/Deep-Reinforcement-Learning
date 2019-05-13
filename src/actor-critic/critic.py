@@ -50,9 +50,3 @@ class Critic(object):
 
         return td_error
 
-
-
-
-
-        return td_error
-
