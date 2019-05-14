@@ -12,6 +12,6 @@ The objective is to learn a plicy that maximize the cumulative future reward to 
 
 Since this is a maximization problem, we can optimize the policy by taking the gradient ascent with the partial derivative of the objective with respect to the policy parameter <img src="http://latex.codecogs.com/gif.latex?\theta"/>
 
-<img src="http://latex.codecogs.com/gif.latex?\theta \gets \theta + \frac{\patial}{\patial_{\theta}}J(\theta)"/>
+<img src="http://latex.codecogs.com/gif.latex?\theta \gets \theta + \frac{\partial}{\partial_{\theta}}J(\theta)"/>
 
 
