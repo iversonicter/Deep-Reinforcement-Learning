@@ -27,3 +27,8 @@ The defined objective function <img src="http://latex.codecogs.com/gif.latex?J(\
 The ultimate gradient can be simiplify as:
 
 <img src="http://latex.codecogs.com/gif.latex?\bigtriangledown_{\theta}J(\theta) = \sum_{t=0}^{T-1}\bigtriangledown_{\theta}log\pi_{\theta}(a_t|s_t)G_t"/>
+
+where:
+
+
+<img src="http://latex.codecogs.com/gif.latex?G_t = \sum_{t'=t+1}^T\gamma^{t'-t-1}r_{t'}"/>
