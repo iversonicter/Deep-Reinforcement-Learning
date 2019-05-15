@@ -23,3 +23,7 @@ Since this is a maximization problem, we can optimize the policy by taking the g
 The defined objective function <img src="http://latex.codecogs.com/gif.latex?J(\theta)"/>. Expand the expectation as:
 
 <img src="http://latex.codecogs.com/gif.latex? J(\theta) = E\[\sum_{i=0}^T r_{t+1}|\pi_{\theta}\] = \sum_{t=i}^{T-1}P(s_t, a_t|\tau)r_{t+1}"/>
+
+The ultimate gradient can be simiplify as:
+
+<img src="http://latex.codecogs.com/gif.latex?\bigtriangledown_{\theta}J(\theta) = \sum_{t=0}^{T-1}\bigtriangledown_{\theta}log\pi_{\theta}(a_t|s_t)G_t"/>
