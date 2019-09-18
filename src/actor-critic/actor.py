@@ -27,10 +27,11 @@ class ANet(nn.Module):
 
 class Actor(object):
 
-    def __init__(self, Net, lr):
+    def __init__(self, Net, lr, exploration_rate = 0.999):
         self.Net = Net
         self.lr = lr
         self.optim = torch.optim.Adam(self.Net.parameters(), lr = self.lr)
+        self.exploration_rate = exploration_rate
 
     def learn(self, state, action, td_error):
         ## compute the gradient and update the model
@@ -53,6 +54,11 @@ class Actor(object):
         prediction = self.Net(state)
         prediction = F.softmax(prediction)
         prediction = prediction[0].cpu().detach().numpy()
-        action = np.random.choice(range(prediction.shape[0]), p = prediction)
+        if np.random.rand() > self.exploration_rate:
+            action = np.random.choice(range(prediction.shape[0]), p = prediction)
+        else:
+            action = np.argmax(prediction)
+
+        self.exploration_rate = self.exploration_rate * 0.99
         return action
 
